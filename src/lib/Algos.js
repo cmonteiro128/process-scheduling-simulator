@@ -1,3 +1,7 @@
+//Chris Monteiro
+//Process Scheduling Simulator - Algorithm Functions 
+//To see live project, go to http://process-sim.surge.sh/
+
 //Caluclates average turn-around times based on gant chart
 //Params: Gant Chart object
 //Returns: WT/TAT Times in
