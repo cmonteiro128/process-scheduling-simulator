@@ -37,6 +37,7 @@ const ProcessInput = props => {
 					onChange={e => props.textHandle(e, 3)}
 					type="number"
 					label="Priority"
+					min="1"
 				  />
 				: null}
 		</LayoutGrid.Cell>

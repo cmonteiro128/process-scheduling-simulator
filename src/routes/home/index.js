@@ -19,6 +19,9 @@ import 'preact-material-components/LayoutGrid/style.css';
 import Card from 'preact-material-components/Card';
 import 'preact-material-components/Card/style.css';
 
+import Snackbar from 'preact-material-components/Snackbar';
+import 'preact-material-components/Snackbar/style.css';
+
 import style from './style';
 
 function getByValue(arr, value) {
@@ -88,7 +91,7 @@ export default class Home extends Component {
 		if (e.selectedIndex == 3) {
 			this.setState({
 				isPriority: true
-			});	
+			});
 		}
 		else {
 			this.setState({
@@ -135,18 +138,25 @@ export default class Home extends Component {
 	}
 
 	simulate() {
-		this.setState({
-			gantchart: executeAlgo(
-				this.state.selectedAlgo,
-				this.state.processes,
-				this.state.quantum
-			)
-		});
-		this.setState({
-			averageTAT: calcTAT(this.state.gantchart, this.state.processes), //We calc TAT first so we can use it for arrival time
-			averageWt: calcWT(this.state.gantchart, this.state.processes)
-		});
-		this.updateCanvas();
+		if (this.state.quantum == 0) {
+			this.bar.MDComponent.show({
+				message: 'Quantum cannot be 0!'
+			});
+		}
+		else {
+			this.setState({
+				gantchart: executeAlgo(
+					this.state.selectedAlgo,
+					this.state.processes,
+					this.state.quantum
+				)
+			});
+			this.setState({
+				averageTAT: calcTAT(this.state.gantchart, this.state.processes), //We calc TAT first so we can use it for arrival time
+				averageWt: calcWT(this.state.gantchart, this.state.processes)
+			});
+			this.updateCanvas();
+		}
 	}
 
 	constructor(props) {
@@ -220,7 +230,9 @@ export default class Home extends Component {
 									</Card.Subtitle>
 									<br />
 									<Card.Subtitle>
-										If arrival time is left blank for any process, it will default to 0. If quantum is left blank for RR, it will default to 1.
+										If arrival time is left blank for any process, it will
+										default to 0. If quantum is left blank for RR, it will
+										default to 1.
 									</Card.Subtitle>
 
 									<br />
@@ -229,9 +241,7 @@ export default class Home extends Component {
 										some issues with the text fields, just refresh the page.
 									</Card.Subtitle>
 									<br />
-									<Card.Subtitle>
-										Author: Chris Monteiro
-									</Card.Subtitle>
+									<Card.Subtitle>Author: Chris Monteiro</Card.Subtitle>
 								</Card.Primary>
 							</Card>
 						</LayoutGrid.Cell>
@@ -303,6 +313,7 @@ export default class Home extends Component {
 									//value={this.state.quantum}
 									onChange={this.handleTotalProcesses}
 									type="number"
+									min="1"
 									label="Quantum"
 								/>
 							</LayoutGrid.Cell>
@@ -370,6 +381,11 @@ export default class Home extends Component {
 						</LayoutGrid.Inner>
 						: null}
 				</LayoutGrid>
+				<Snackbar
+					ref={bar => {
+						this.bar = bar;
+					}}
+				/>
 			</div>
 		);
 	}
