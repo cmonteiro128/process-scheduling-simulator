@@ -1,6 +1,6 @@
 # Process Scheduling Simulator
 
-This is an online simulator for general operating system process schedling algorithms. See the link at the top for a live running version of the app.
+This is an online simulator for general operating system process schedling algorithms. For a live running version of the app, click [here](http://process-sim.surge.sh/)
 
 To run locally:
 

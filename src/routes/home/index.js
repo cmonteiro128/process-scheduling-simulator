@@ -85,6 +85,16 @@ export default class Home extends Component {
 		this.setState({
 			selectedAlgo: e.selectedIndex
 		});
+		if (e.selectedIndex == 3) {
+			this.setState({
+				isPriority: true
+			});	
+		}
+		else {
+			this.setState({
+				isPriority: false
+			});
+		}
 	};
 
 	updateCanvas() {
@@ -157,7 +167,8 @@ export default class Home extends Component {
 			averageWt: null,
 			averageTAT: null,
 			canvasImage: '',
-			showCanvas: false
+			showCanvas: false,
+			isPriority: false
 		};
 
 		this.handleTotalProcesses = this.handleTotalProcesses.bind(this);
@@ -184,6 +195,7 @@ export default class Home extends Component {
 		for (let i = 0; i < this.state.numberOfProcesses; i++) {
 			processInputs.push(
 				<ProcessInput
+					isPriority={this.state.isPriority}
 					value={this.state.processes[i]}
 					textHandle={this.handleProcessInfo}
 					num={i}
@@ -216,6 +228,10 @@ export default class Home extends Component {
 										Note: There are currently some UI bugs. If you experiece
 										some issues with the text fields, just refresh the page.
 									</Card.Subtitle>
+									<br />
+									<Card.Subtitle>
+										Author: Chris Monteiro
+									</Card.Subtitle>
 								</Card.Primary>
 							</Card>
 						</LayoutGrid.Cell>
@@ -234,6 +250,7 @@ export default class Home extends Component {
 								name="numberOfProcesses"
 								value={this.state.numberOfProcesses}
 								onChange={this.handleTotalProcesses}
+								isPriority={this.state.isPriority}
 								type="number"
 								label="Processes"
 							/>
@@ -296,7 +313,7 @@ export default class Home extends Component {
 							{processInputs}
 						</LayoutGrid.Inner>
 						: null}
-					{this.state.selectedAlgo != -1
+					{/*this.state.selectedAlgo != -1
 						? <LayoutGrid.Inner>
 							<LayoutGrid.Cell desktopCols="3" tabletCols="4" phoneCols="4">
 								<div>
@@ -304,7 +321,7 @@ export default class Home extends Component {
 								</div>
 							</LayoutGrid.Cell>
 						</LayoutGrid.Inner>
-						: null}
+						: null*/}
 					{this.state.selectedAlgo != -1
 						? <LayoutGrid.Inner>
 							<LayoutGrid.Cell desktopCols="3" tabletCols="4" phoneCols="4">

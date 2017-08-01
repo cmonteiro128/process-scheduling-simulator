@@ -5,8 +5,9 @@
   "license": "MIT",
   "scripts": {
     "start": "if-env NODE_ENV=production && yarn run -s serve || yarn run -s dev",
-    "build": "preact build",
-    "serve": "preact build && preact serve",
+    "build": "preact build --no-prerender",
+    "serve": "preact build --no-prerender && preact serve",
+    "deploy": "yarn run build && surge -p build -d process-sim.surge.sh",
     "dev": "preact watch",
     "stop": "killall -9 node",
     "test": "eslint src && preact test"
