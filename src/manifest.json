@@ -1,6 +1,6 @@
 {
-  "name": "Preact PWA",
-  "short_name": "Preact PWA",
+  "name": "Process Scheduling Simulator",
+  "short_name": "Process Sim",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",

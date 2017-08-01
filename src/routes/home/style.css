@@ -1,5 +1,21 @@
 .home {
-	padding: 56px 20px;
-	min-height: 100%;
-	width: 100%;
+  min-height: 100%;
+  width: 100%;
+}
+
+.selectsyle {
+  width: 82px;
+  padding-right: 24px;
+}
+
+#processText {
+  padding-top: 34px;
+}
+
+#simulate {
+  margin-top: 10px;
+}
+
+#quantumText{
+  font-weight: bold;
 }
