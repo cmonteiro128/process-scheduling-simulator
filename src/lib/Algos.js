@@ -1,6 +1,3 @@
-//Will eventually auto generate the object above
-//function createProcesses() {}
-
 //Caluclates average turn-around times based on gant chart
 //Params: Gant Chart object
 //Returns: WT/TAT Times in
@@ -21,12 +18,11 @@ export function calcTAT(gantchart, processes) {
 				gantchart[i - 1].endTime + gantchart[i].runningTime;
 		}
 	}
-	console.log(gantchart);
 	//For each process, lets find its final end time (TAT)
 	for (let i = gantchart.length - 1; i >= 0; i--) {
 		for (let j = 0; j < TotalProcesses; j++) {
 			if (gantchart[i].pid == processes[j].pid && processes[j].TAT == 0) {
-				processes[j].TAT = gantchart[i].endTime;
+				processes[j].TAT = gantchart[i].endTime - processes[j].arrivalTime;
 			}
 		}
 	}
@@ -45,8 +41,7 @@ export function calcTAT(gantchart, processes) {
 export function calcWT(gantchart, processes) {
 	//Get wait for each process. Easy!, just: Wt = tat - bt - at
 	for (let i = 0; i < processes.length; i++) {
-		processes[i].WT =
-			processes[i].TAT - processes[i].burstTime - processes[i].arrivalTime;
+		processes[i].WT = processes[i].TAT - processes[i].burstTime;
 	}
 	//Lets get the average
 	let total = 0;
@@ -247,6 +242,7 @@ function roundrobin(processes, algoType, quantum) {
 	let currentTime = 0;
 	let gantchart = [];
 	let currentGantBlock;
+	parseInt(quantum, 10);
 	console.log(quantum);
 	//Assign a remaining time to all processes
 	for (let i = 0; i < internalProcesses.length; i++) {
@@ -263,11 +259,11 @@ function roundrobin(processes, algoType, quantum) {
 			if (internalProcesses[0].remainingTime >= quantum) {
 				//It will fill whole quantum
 				currentGantBlock = {
-					runningTime: quantum,
+					runningTime: parseInt(quantum, 10),
 					pid: internalProcesses[0].pid
 				};
 				gantchart.push(currentGantBlock);
-				internalProcesses[0].remainingTime -= quantum;
+				internalProcesses[0].remainingTime -= parseInt(quantum, 10);
 				//If it finished, remove it
 				if (internalProcesses[0].remainingTime <= 0)
 					internalProcesses.splice(0, 1);
@@ -276,7 +272,7 @@ function roundrobin(processes, algoType, quantum) {
 					internalProcesses.push(internalProcesses[0]);
 					internalProcesses.shift();
 				}
-				currentTime += quantum;
+				currentTime += parseInt(quantum, 10);
 			}
 			else {
 				//Wont occupy the whole quantum (Finish process and shift it off)
@@ -289,11 +285,12 @@ function roundrobin(processes, algoType, quantum) {
 					//Fixed
 					//Push Idle for the rest of the quantum
 					currentGantBlock = {
-						runningTime: quantum - internalProcesses[0].remainingTime,
+						runningTime:
+							parseInt(quantum, 10) - internalProcesses[0].remainingTime,
 						pid: 'Idle'
 					};
 					gantchart.push(currentGantBlock);
-					currentTime += quantum;
+					currentTime += parseInt(quantum, 10);
 				}
 				else if (algoType == 2) {
 					//Variable
@@ -307,15 +304,28 @@ function roundrobin(processes, algoType, quantum) {
 			//First process is not arrived, loop through to find one that has
 			let loopCheck = 0;
 			while (arriveLoop == false) {
+				//If this if runs, it means nothing is arrived, so we add idle time
 				if (loopCheck == internalProcesses.length) {
-					//There none available
-					currentGantBlock = {
-						runningTime: 1,
-						pid: 'Idle'
-					};
-					gantchart.push(currentGantBlock);
-					currentTime++;
-					break;
+					if (algoType == 1) {
+						//For fixed RR, we want idle to fill the quantum
+						currentGantBlock = {
+							runningTime: parseInt(quantum, 10),
+							pid: 'Idle'
+						};
+						gantchart.push(currentGantBlock);
+						currentTime += parseInt(quantum, 10);
+						break;
+					}
+					else if (algoType == 2) {
+						//For variable we want it to be only 1 and check repeatedly
+						currentGantBlock = {
+							runningTime: 1,
+							pid: 'Idle'
+						};
+						gantchart.push(currentGantBlock);
+						currentTime++;
+						break;
+					}
 				}
 				if (internalProcesses[loopCheck].arrivalTime <= currentTime) {
 					//This is arrived, move it to front
@@ -330,6 +340,10 @@ function roundrobin(processes, algoType, quantum) {
 		if (internalProcesses.length == 0) {
 			finished = true;
 		}
+	}
+	if (gantchart[gantchart.length - 1].pid == 'Idle') {
+		gantchart.splice(gantchart.length - 1, 1);
+		console.log("test");
 	}
 	return mergeDuplicates(gantchart);
 }

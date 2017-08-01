@@ -16,6 +16,9 @@ import 'preact-material-components/Select/style.css';
 import LayoutGrid from 'preact-material-components/LayoutGrid';
 import 'preact-material-components/LayoutGrid/style.css';
 
+import Card from 'preact-material-components/Card';
+import 'preact-material-components/Card/style.css';
+
 import style from './style';
 
 function getByValue(arr, value) {
@@ -85,9 +88,6 @@ export default class Home extends Component {
 	};
 
 	updateCanvas() {
-		this.setState({
-			showCanvas: true
-		});
 		const ctx = this.canvas.getContext('2d');
 		ctx.clearRect(0, 0, 1200, 70);
 		let startPosition = 5;
@@ -95,29 +95,33 @@ export default class Home extends Component {
 		//Print the zero
 		ctx.fillText(0, 3, 57);
 		for (let i = 0; i < this.state.gantchart.length; i++) {
-			let currentRectTime = this.state.gantchart[i].runningTime;
-			if (i != 0) prevRectTime = this.state.gantchart[i - 1].endTime;
-			let currentEndTime = this.state.gantchart[i].endTime;
-			let currentPid = this.state.gantchart[i].pid;
-			ctx.font = '12px Roboto';
-			ctx.strokeRect(startPosition, 20, currentRectTime * 11, 25);
-			ctx.fillText(
-				currentPid,
-				currentRectTime * 11 / 2 + prevRectTime * 11,
-				35
-			);
-			ctx.fillText(
-				currentEndTime,
-				currentRectTime * 11 + prevRectTime * 11,
-				57
-			);
-			startPosition += currentRectTime * 11;
+			(i => {
+				window.setTimeout(() => {
+					let currentRectTime = this.state.gantchart[i].runningTime;
+					if (i != 0) prevRectTime = this.state.gantchart[i - 1].endTime;
+					let currentEndTime = this.state.gantchart[i].endTime;
+					let currentPid = this.state.gantchart[i].pid;
+					ctx.font = '12px Roboto';
+					ctx.strokeRect(startPosition, 20, currentRectTime * 11, 25);
+					ctx.fillText(
+						currentPid,
+						currentRectTime * 11 / 2 + prevRectTime * 11,
+						35
+					);
+					ctx.fillText(
+						currentEndTime,
+						currentRectTime * 11 + prevRectTime * 11,
+						57
+					);
+					startPosition += currentRectTime * 11;
+				}, i * 1000);
+			})(i);
 		}
-		let canvas = document.getElementById('canvas');
+
+		/*let canvas = document.getElementById('canvas');
 		this.setState({
 			canvasImage: canvas.toDataURL('image/png')
-		});
-		document.getElementById('canvas').style.display = 'none';
+		});*/
 	}
 
 	simulate() {
@@ -148,6 +152,7 @@ export default class Home extends Component {
 					priority: null
 				}
 			],
+			quantum: 1, //Default if blank
 			gantchart: '',
 			averageWt: null,
 			averageTAT: null,
@@ -163,7 +168,8 @@ export default class Home extends Component {
 	}
 
 	componentDidUpdate() {
-		document.getElementById('canvas').style.display = 'none';
+		//document.getElementById('canvas').style.display = 'none';
+
 		//Our select menu keeps changing value, lets fix it directly
 		if (this.state.selectedAlgo != -1)
 			document.getElementById(
@@ -189,6 +195,31 @@ export default class Home extends Component {
 		return (
 			<div class={style.home}>
 				<LayoutGrid>
+					<LayoutGrid.Inner>
+						<LayoutGrid.Cell desktopCols="5" tabletCols="4" phoneCols="4">
+							<Card>
+								<Card.Primary>
+									<Card.Title>Welcome</Card.Title>
+									<Card.Subtitle>
+										To begin, please enter the total number of processes you
+										would like to simulate. You may then choose an algorithm,
+										and enter the appropirate process information. When
+										finished, press the simulate button.
+									</Card.Subtitle>
+									<br />
+									<Card.Subtitle>
+										If arrival time is left blank for any process, it will default to 0. If quantum is left blank for RR, it will default to 1.
+									</Card.Subtitle>
+
+									<br />
+									<Card.Subtitle>
+										Note: There are currently some UI bugs. If you experiece
+										some issues with the text fields, just refresh the page.
+									</Card.Subtitle>
+								</Card.Primary>
+							</Card>
+						</LayoutGrid.Cell>
+					</LayoutGrid.Inner>
 					<LayoutGrid.Inner>
 						<LayoutGrid.Cell desktopCols="3" tabletCols="4" phoneCols="4">
 							<div
@@ -229,8 +260,8 @@ export default class Home extends Component {
 									<Select.Item>Shortest Job First</Select.Item>
 									<Select.Item>Shortest Remaining Time</Select.Item>
 									<Select.Item>Priority</Select.Item>
-									<Select.Item>Round Robin - Fixed Quantum</Select.Item>
-									<Select.Item>Round Robin - Variable Quantum</Select.Item>
+									<Select.Item>Round Robin - Fixed</Select.Item>
+									<Select.Item>Round Robin - Variable</Select.Item>
 								</Select>
 							</LayoutGrid.Cell>
 						</LayoutGrid.Inner>
@@ -294,7 +325,6 @@ export default class Home extends Component {
 							{this.state.showCanvas != false
 								? <div id={style.quantumText}>Gant Chart</div>
 								: null}
-
 							<div>
 								<canvas
 									ref={canvas => {
@@ -304,7 +334,7 @@ export default class Home extends Component {
 									height={70}
 									id="canvas"
 								/>
-								<img src={this.state.canvasImage} />
+								{/*<img src={this.state.canvasImage} />*/}
 							</div>
 						</LayoutGrid.Cell>
 					</LayoutGrid.Inner>
